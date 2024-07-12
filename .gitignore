@@ -1,0 +1,11 @@
+## IntelliJ
+**/out/
+**/.idea/
+*.iml
+build
+
+# macOS folder meta-data
+*.DS_Store
+
+# Gradle file
+.gradle
