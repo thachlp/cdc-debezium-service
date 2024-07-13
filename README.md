@@ -40,7 +40,7 @@ curl -i -X POST \
   -H "Content-Type: application/json" \
   localhost:8083/connectors/ \
   -d '{
-    "name": "lyclass-connector",
+    "name": "mysql-connector",
     "config": {
       "connector.class": "io.debezium.connector.mysql.MySqlConnector",
       "tasks.max": "1",
@@ -49,7 +49,7 @@ curl -i -X POST \
       "database.user": "root",
       "database.password": "123456",
       "database.server.id": "184054",
-      "topic.prefix": "coffee_shop",
+      "topic.prefix": "mysql",
       "database.include.list": "coffee_shop",
       "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
       "schema.history.internal.kafka.topic": "schemahistory.coffee_shop"
