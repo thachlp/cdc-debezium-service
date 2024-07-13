@@ -66,7 +66,7 @@ curl -i -X POST \
 
 ##### Access the kafka container
 ```shell
-docker exec -it cdc-debezium-service-kafka-1 /bin/bash 
+docker exec -it cdc-debezium-consumer-kafka-1 /bin/bash 
 cd bin
 ```
 

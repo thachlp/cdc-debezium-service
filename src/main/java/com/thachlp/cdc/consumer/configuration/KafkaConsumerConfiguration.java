@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 @EnableKafka
 public class KafkaConsumerConfiguration {
 
-    private static final String TOPIC_PATTERN_REGEX = "coffee_shop\\..*";
+    private static final String TOPIC_PATTERN_REGEX = "mysql\\..*";
     private static final String BOOTSTRAP_SERVERS = "0.0.0.0:9094";
 
     private static Map<String, Object> consumerProps() {
