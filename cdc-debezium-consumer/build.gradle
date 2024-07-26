@@ -44,13 +44,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.withType(Test).configureEach {
-    testLogging {
-        events ("passed", "skipped", "failed")
-        showStandardStreams = true
-    }
-}
-
 testlogger {
     theme 'mocha'
     slowThreshold 500
