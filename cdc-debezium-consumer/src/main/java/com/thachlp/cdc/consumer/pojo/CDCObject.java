@@ -59,6 +59,7 @@ public class CDCObject {
         private CDCPayloadSource source;
         private LinkedHashMap<String, Object> before;
         private LinkedHashMap<String, Object> after;
+        private String op;
     }
 
     @Data

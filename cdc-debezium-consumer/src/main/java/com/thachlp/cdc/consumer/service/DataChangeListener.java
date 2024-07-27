@@ -29,6 +29,7 @@ public class DataChangeListener {
     private static final Map<String, List<String>> mapPrivateKey = new HashMap<>();
     private final TableMetaDataAccess tableMetaDataAccess;
     private static final EnumMap<DMLType, QueryBuildable> actionBuilder = new EnumMap<>(DMLType.class);
+    private static final String READ = "r";
 
     static {
         actionBuilder.put(DMLType.INSERT, new QueryBuilderInsert());
@@ -42,6 +43,10 @@ public class DataChangeListener {
         try {
             jsonNode = objectMapper.readValue(message, CDCObject.class);
             final String database = jsonNode.getPayload().getSource().getDb();
+            if (READ.equals(jsonNode.getPayload().getOp())){
+                return;
+            }
+
             final String table = jsonNode.getPayload().getSource().getTable();
 
             if (!mapPrivateKey.containsKey(table)) {
