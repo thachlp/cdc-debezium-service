@@ -10,11 +10,11 @@ import com.thachlp.cdc.consumer.querybuilder.QueryBuilderInsert;
 import com.thachlp.cdc.consumer.querybuilder.QueryBuilderUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -38,10 +38,14 @@ public class DataChangeListener {
     }
 
     @KafkaListener(topicPattern = "#{@topicPattern}", groupId = "coffee_shop")
-    public void listen(String message) {
+    public void listen(@Payload ConsumerRecord<String, String> event) {
         final CDCObject jsonNode;
         try {
-            jsonNode = objectMapper.readValue(message, CDCObject.class);
+            if (event.value() == null) {
+                log.warn("Received null value for event {}", event.key());
+                return;
+            }
+            jsonNode = objectMapper.readValue(event.value(), CDCObject.class);
             final String database = jsonNode.getPayload().getSource().getDb();
             if (READ.equals(jsonNode.getPayload().getOp())){
                 return;
@@ -57,7 +61,7 @@ public class DataChangeListener {
                     .build(table, mapPrivateKey.get(table), jsonNode);
             log.info("Executed query: {}",  query);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Error processing message: {}, error {}", event.value(), e.getMessage(), e);
         }
     }
 
