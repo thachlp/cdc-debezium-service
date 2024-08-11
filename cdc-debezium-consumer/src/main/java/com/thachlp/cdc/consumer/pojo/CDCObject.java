@@ -41,8 +41,21 @@ public class CDCObject {
             }
 
             return fields.stream()
-                         .collect(Collectors.toMap(CDCSchemaFieldStruct::getField,
-                                                   s -> s.getName() != null && s.getName().contains("Timestamp") ? "Timestamp": s.getType()));
+                    .collect(Collectors.toMap(CDCSchemaFieldStruct::getField,
+                            s -> {
+                                final String fieldName = s.getName();
+                                if (fieldName != null) {
+                                    if (fieldName.contains("MicroTimestamp")) {
+                                        return "MicroTimestamp";
+                                    } else if (fieldName.contains("ZonedTimestamp")) {
+                                        return "ZonedTimestamp";
+                                    } else if (fieldName.contains("Timestamp")) {
+                                        return "Timestamp";
+                                    }
+                                }
+                                return s.getType();
+                            }
+                    ));
         }
     }
 
