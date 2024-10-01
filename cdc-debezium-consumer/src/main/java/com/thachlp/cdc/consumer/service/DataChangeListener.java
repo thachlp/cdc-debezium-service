@@ -29,10 +29,9 @@ public class DataChangeListener {
     private static final Map<String, List<String>> mapPrivateKey = new HashMap<>();
     private final TableMetaDataAccess tableMetaDataAccess;
     private static final EnumMap<DMLType, QueryBuildable> actionBuilder = new EnumMap<>(DMLType.class);
-    private static final String READ = "r";
 
     static {
-        actionBuilder.put(DMLType.INSERT, new QueryBuilderInsert());
+        actionBuilder.put(DMLType.CREATE, new QueryBuilderInsert());
         actionBuilder.put(DMLType.UPDATE, new QueryBuilderUpdate());
         actionBuilder.put(DMLType.DELETE, new QueryBuilderDelete());
     }
@@ -42,36 +41,42 @@ public class DataChangeListener {
         final CDCObject jsonNode;
         try {
             if (event.value() == null) {
-                log.warn("Received null value for event {}", event.key());
+                log.info("Received a tombstone event with key {}", event.key());
                 return;
             }
+
             jsonNode = objectMapper.readValue(event.value(), CDCObject.class);
             final String database = jsonNode.getPayload().getSource().getDb();
-            if (READ.equals(jsonNode.getPayload().getOp())){
+            if (getActionType(jsonNode.getPayload()) == DMLType.READ) {
+                return;
+            }
+
+            if (!"false".equals(jsonNode.getPayload().getSource().getSnapshot())) {
+                if ("last".equals(jsonNode.getPayload().getSource().getSnapshot())) {
+                    log.info("Snapshot finished");
+                }
                 return;
             }
 
             final String table = jsonNode.getPayload().getSource().getTable();
-
             if (!mapPrivateKey.containsKey(table)) {
                 mapPrivateKey.put(table, tableMetaDataAccess.getPrimaryKeysFrom(database, table));
             }
 
             final String query = actionBuilder.get(getActionType(jsonNode.getPayload()))
                     .build(table, mapPrivateKey.get(table), jsonNode);
-            log.info("Executed query: {}",  query);
+            log.info("The captured query: {}",  query);
         } catch (Exception e) {
             log.error("Error processing message: {}, error {}", event.value(), e.getMessage(), e);
         }
     }
 
     private static DMLType getActionType(CDCObject.CDCPayload payload) {
-        if (payload.getBefore() == null) {
-            return DMLType.INSERT;
-        }
-        if (payload.getAfter() == null) {
-            return DMLType.DELETE;
-        }
-        return DMLType.UPDATE;
+        return switch (payload.getOp()) {
+            case "c" -> DMLType.CREATE;
+            case "d" -> DMLType.DELETE;
+            case "u" -> DMLType.UPDATE;
+            default -> DMLType.READ;
+        };
     }
 }

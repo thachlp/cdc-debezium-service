@@ -80,5 +80,6 @@ public class CDCObject {
         private String db;
         private String table;
         private String query;
+        private String snapshot;
     }
 }
