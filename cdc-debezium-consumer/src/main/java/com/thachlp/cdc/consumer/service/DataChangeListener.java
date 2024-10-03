@@ -51,10 +51,7 @@ public class DataChangeListener {
                 return;
             }
 
-            if (!"false".equals(jsonNode.getPayload().getSource().getSnapshot())) {
-                if ("last".equals(jsonNode.getPayload().getSource().getSnapshot())) {
-                    log.info("Snapshot finished");
-                }
+            if (isSnapshot(jsonNode.getPayload().getSource().getSnapshot())) {
                 return;
             }
 
@@ -78,5 +75,15 @@ public class DataChangeListener {
             case "u" -> DMLType.UPDATE;
             default -> DMLType.READ;
         };
+    }
+
+    private static boolean isSnapshot(String snapshot) {
+        if (!"false".equals(snapshot)) {
+            if ("last".equals(snapshot)) {
+                log.info("Snapshot finished");
+            }
+            return true;
+        }
+        return false;
     }
 }
