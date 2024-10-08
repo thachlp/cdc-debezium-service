@@ -10,11 +10,12 @@
 - `binlog_format` should be ROW
 - `binlog_row_image` should be FULL
     ```text
-    SHOW VARIABLES LIKE 'log_bin'; -- ON
-    SHOW VARIABLES LIKE 'binlog_format'; -- ROW
-    SHOW VARIABLES LIKE 'binlog_row_image'; -- FULL
+    SHOW VARIABLES LIKE 'log_bin';
+    SHOW VARIABLES LIKE 'binlog_format';
+    SHOW VARIABLES LIKE 'binlog_row_image';
     ```
 - `database.user` uses for cdc should have `RELOAD` or `FLUSH_TABLES` privilege(s).
+- `binlog_rows_query_log_events=ON` enable original query event in binlog.
 
 ##### Kafka Config
 `auto.create.topics.enable` should be true
