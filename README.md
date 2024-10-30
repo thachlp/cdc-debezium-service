@@ -6,16 +6,14 @@
 - [Docker Compose](script/install_docker_compose.sh)
 
 ##### MySQL Config
-- `log_bin` should be ON
-- `binlog_format` should be ROW
-- `binlog_row_image` should be FULL
-    ```text
-    SHOW VARIABLES LIKE 'log_bin';
-    SHOW VARIABLES LIKE 'binlog_format';
-    SHOW VARIABLES LIKE 'binlog_row_image';
-    ```
-- `database.user` uses for cdc should have `RELOAD` or `FLUSH_TABLES` privilege(s).
-- `binlog_rows_query_log_events=ON` enable original query event in binlog.
+| Property          | Expected Value | Verification SQL Statement                  |
+|-------------------|----------------|---------------------------------------------|
+| log_bin           | ON             | SHOW VARIABLES LIKE 'log_bin';              |
+| binlog_format     | ROW            | SHOW VARIABLES LIKE 'binlog_format';        |
+| binlog_row_image  | FULL           | SHOW VARIABLES LIKE 'binlog_row_image';     |
+
+**User**:
+- a user has `RELOAD` or `FLUSH_TABLES` privilege(s).
 
 ##### Kafka Config
 `auto.create.topics.enable` should be true
@@ -36,7 +34,6 @@ curl -i -X POST \
     "name": "source-connector",
     "config": {
       "connector.class": "io.debezium.connector.mysql.MySqlConnector",
-      "tasks.max": "1",
       "database.hostname": "mysql",
       "database.port": "3306",
       "database.user": "root",
