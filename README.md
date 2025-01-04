@@ -1,11 +1,15 @@
 ### CDC Service for MySQL
+### Overview 
+
+![Overview](dbz-flow.png)
+
 ### Prerequisite
 
-##### Install 
+##### 1. Install 
 - [Docker](script/install_docker.sh)
 - [Docker Compose](script/install_docker_compose.sh)
 
-##### MySQL Config
+##### 2. MySQL Config
 | Property          | Expected Value | Verification SQL Statement                  |
 |-------------------|----------------|---------------------------------------------|
 | log_bin           | ON             | SHOW VARIABLES LIKE 'log_bin';              |
@@ -15,16 +19,16 @@
 **User**:
 - a user has `RELOAD` or `FLUSH_TABLES` privilege(s).
 
-##### Kafka Config
+##### 3. Kafka Config
 `auto.create.topics.enable` should be true
 
 ### How to run
-##### Start services
+##### 1. Start services
 ```shell
 docker compose up -d
 ```
 
-##### Create source connector
+##### 2. Create source connector
 ```shell
 curl -i -X POST \
   -H "Accept: application/json" \
@@ -47,7 +51,7 @@ curl -i -X POST \
   }'
 ```
 
-##### Start consumer
+##### 3. Start consumer
 ```shell
 cd cdc-debezium-consumer
 ./gradlew run -d
@@ -55,17 +59,17 @@ cd cdc-debezium-consumer
 
 ### Troubleshooting
 
-##### Check status of Kafka Connect service
+##### 1. Check status of Kafka Connect service
 ```shell
 curl -H "Accept:application/json" localhost:8083/
 ```
 
-##### Check available plugins
+##### 2. Check available plugins
 ```shell
 curl -s localhost:8083/connector-plugins
 ```
 
-##### Check list connectors registered with Kafka Connect
+##### 3. Check list connectors registered with Kafka Connect
 ```shell
 curl -H "Accept:application/json" localhost:8083/connectors/
 ```
@@ -74,13 +78,13 @@ curl -H "Accept:application/json" localhost:8083/connectors/
 curl -X DELETE localhost:8083/connectors/source-connector
 ```
 
-##### Access the kafka container
+##### 4. Access the kafka container
 ```shell
 docker exec -it cdc-debezium-consumer-kafka-1 /bin/bash 
 cd bin
 ```
 
-##### List kafka topic
+##### 5. List kafka topic
 ```shell
 kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
