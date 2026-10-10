@@ -3,6 +3,11 @@
 
 ![Overview](dbz-flow.png)
 
+### Contribution & AI Guidelines
+- Use `AGENTS.md` for project-level architecture, domain constraints, and AI workflow rules.
+- Use `CODING_GUIDELINE.md` as the single source of truth for coding style and micro-level conventions.
+- If there is overlap, keep detailed style rules in `CODING_GUIDELINE.md` and keep `AGENTS.md` high-level.
+
 ### Prerequisite
 
 ##### 1. Install 
