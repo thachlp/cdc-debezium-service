@@ -3,7 +3,7 @@
 This document defines the micro-level coding standards, aesthetics, and syntax rules for the project.
 
 ## Build & IDE Setup
-- **Java Version:** OpenJDK 17 (or later).
+- **Java Version:** OpenJDK 21 (or later).
 - **IDE:** IntelliJ IDEA (Gradle project).
 - **Linting:** Use SonarLint plugin to auto-detect code smells.
 - **CI/CD:** Always make the build pass (`./gradlew build`) locally before pushing.

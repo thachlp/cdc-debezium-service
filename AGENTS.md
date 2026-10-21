@@ -10,7 +10,7 @@ Default mindset:
 # Tech Stack & Environment
 Use this stack by default unless repository code/config states otherwise:
 
-- Language: Java 17+
+- Language: Java 21+
 - Build tool: Gradle Wrapper (`./gradlew`)
 - Service module: `cdc-debezium-consumer`
 - CDC connector: `io.debezium.connector.mysql.MySqlConnector`
@@ -48,7 +48,7 @@ Hard rules:
 Rules:
 - Do not duplicate or redefine detailed style rules in this file.
 - Apply all conventions in `CODING_GUIDELINE.md` as-is (build discipline, syntax/style, API preference, formatting aesthetics, JPA/Lombok constraints).
-- If a convention is missing, use standard Java 17 clean-code best practices consistent with the existing codebase.
+- If a convention is missing, use standard Java 21 clean-code best practices consistent with the existing codebase.
 
 Precedence for implementation decisions:
 1. Explicit user requirement for the current task.
