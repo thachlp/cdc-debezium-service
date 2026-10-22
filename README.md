@@ -59,7 +59,7 @@ curl -i -X POST \
 ##### 3. Start consumer
 ```shell
 cd cdc-debezium-consumer
-./gradlew run -d
+./gradlew run
 ```
 
 ### Troubleshooting
@@ -85,7 +85,7 @@ curl -X DELETE localhost:8083/connectors/source-connector
 
 ##### 4. Access the kafka container
 ```shell
-docker exec -it cdc-debezium-consumer-kafka-1 /bin/bash 
+docker exec -it kafka /bin/bash 
 cd bin
 ```
 
