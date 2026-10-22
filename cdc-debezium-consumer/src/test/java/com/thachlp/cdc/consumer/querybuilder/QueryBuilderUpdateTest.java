@@ -1,5 +1,7 @@
 package com.thachlp.cdc.consumer.querybuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thachlp.cdc.consumer.common.CdcEventTestFiles;
 import com.thachlp.cdc.consumer.pojo.CDCObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,22 +15,22 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class QueryBuilderUpdateTest extends QueryBuilderTest {
+class QueryBuilderUpdateTest {
     @InjectMocks
     private QueryBuilderUpdate queryBuilderUpdate;
+    private ObjectMapper objectMapper;
 
-    @Override
     @BeforeEach
     public void setup() {
-        super.setup();
+        objectMapper = CdcEventTestFiles.newObjectMapper();
         queryBuilderUpdate = new QueryBuilderUpdate();
     }
 
     @Test
     void testBuild_UpdateQuery() throws IOException {
-        final File jsonFile = new File(FILE_UPDATE);
+        final File jsonFile = CdcEventTestFiles.UPDATE.toFile();
         final CDCObject cdcObject = objectMapper.readValue(jsonFile, CDCObject.class);
-        final String query = queryBuilderUpdate.build(TABLE_NAME, PRIMARY_KEYS, cdcObject);
+        final String query = queryBuilderUpdate.build(CdcEventTestFiles.TABLE_NAME, CdcEventTestFiles.PRIMARY_KEYS, cdcObject);
         final String expectedQuery = "UPDATE category SET name='Ice-Blended',created_at='2024-07-12 04:14:39',updated_at='2024-07-12 04:14:39',old_name='Tea' WHERE id=1;";
 
         assertEquals(expectedQuery, query);

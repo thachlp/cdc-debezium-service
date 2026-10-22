@@ -1,0 +1,33 @@
+{
+  "schema": {
+    "type": "struct",
+    "name": "io.debezium.connector.mysql.SchemaChangeValue"
+  },
+  "payload": {
+    "source": {
+      "version": "2.7.3.Final",
+      "connector": "mysql",
+      "name": "mysql",
+      "ts_ms": 1792665168000,
+      "snapshot": "false",
+      "db": "coffee_shop",
+      "table": "product",
+      "server_id": 1,
+      "file": "binlog.000002",
+      "pos": 154368,
+      "row": 0,
+      "query": null
+    },
+    "ts_ms": 1792665168931,
+    "databaseName": "coffee_shop",
+    "schemaName": null,
+    "ddl": "CREATE TABLE product\n(\n    id          BIGINT NOT NULL auto_increment,\n    name        VARCHAR(255) NOT NULL,\n    price       DECIMAL(10, 2) NOT NULL,\n    description TEXT,\n    image       TINYTEXT,\n    category_id BIGINT NOT NULL,\n    created_at  DATETIME,\n    updated_at  DATETIME,\n    PRIMARY KEY (id),\n    FOREIGN KEY (category_id) REFERENCES category(id)\n)",
+    "tableChanges": [
+      {
+        "type": "CREATE",
+        "id": "\"coffee_shop\".\"product\""
+      }
+    ]
+  }
+}
+

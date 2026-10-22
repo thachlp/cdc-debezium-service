@@ -1,5 +1,7 @@
 package com.thachlp.cdc.consumer.querybuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thachlp.cdc.consumer.common.CdcEventTestFiles;
 import com.thachlp.cdc.consumer.pojo.CDCObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,22 +15,22 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class QueryBuilderDeleteTest extends QueryBuilderTest {
+class QueryBuilderDeleteTest {
     @InjectMocks
     private QueryBuilderDelete queryBuilderDelete;
+    private ObjectMapper objectMapper;
 
-    @Override
     @BeforeEach
     public void setup() {
-        super.setup();
+        objectMapper = CdcEventTestFiles.newObjectMapper();
         queryBuilderDelete = new QueryBuilderDelete();
     }
 
     @Test
     void testBuild_DeleteQuery() throws IOException {
-        final File jsonFile = new File(FILE_DELETE);
+        final File jsonFile = CdcEventTestFiles.DELETE.toFile();
         final CDCObject cdcObject = objectMapper.readValue(jsonFile, CDCObject.class);
-        final String query = queryBuilderDelete.build(TABLE_NAME, PRIMARY_KEYS, cdcObject);
+        final String query = queryBuilderDelete.build(CdcEventTestFiles.TABLE_NAME, CdcEventTestFiles.PRIMARY_KEYS, cdcObject);
         final String expectedQuery = "DELETE FROM category WHERE id=1;";
 
         assertEquals(expectedQuery, query);
