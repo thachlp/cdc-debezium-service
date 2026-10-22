@@ -78,6 +78,12 @@ curl -s localhost:8083/connector-plugins
 ```shell
 curl -H "Accept:application/json" localhost:8083/connectors/
 ```
+
+#### Check connector status
+```shell
+curl -H "Accept:application/json" localhost:8083/connectors/source-connector/status
+```
+
 #### Delete a connector
 ```shell
 curl -X DELETE localhost:8083/connectors/source-connector
