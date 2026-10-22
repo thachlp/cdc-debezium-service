@@ -73,6 +73,7 @@ public class CDCObject {
         private LinkedHashMap<String, Object> before;
         private LinkedHashMap<String, Object> after;
         private String op;
+        private String ddl;
     }
 
     @Data
