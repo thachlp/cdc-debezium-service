@@ -8,9 +8,9 @@ import java.util.List;
 
 public final class CdcEventTestFiles {
 
-    public static final Path INSERT = Path.of("src/test/resources/cdc-event/insert.json");
-    public static final Path UPDATE = Path.of("src/test/resources/cdc-event/update.json");
-    public static final Path DELETE = Path.of("src/test/resources/cdc-event/delete.json");
+    public static final Path INSERT = Path.of("src/test/resources/cdc-event/insert-category.json");
+    public static final Path UPDATE = Path.of("src/test/resources/cdc-event/update-category.json");
+    public static final Path DELETE = Path.of("src/test/resources/cdc-event/delete-category.json");
     public static final Path DDL_CREATE_PRODUCT = Path.of("src/test/resources/cdc-event/ddl-create-product.json");
     public static final Path DDL_DROP_PRODUCT = Path.of("src/test/resources/cdc-event/ddl-drop-product.json");
     public static final String TABLE_NAME = "category";
@@ -25,6 +25,7 @@ public final class CdcEventTestFiles {
         return objectMapper;
     }
 }
+
 
 
 

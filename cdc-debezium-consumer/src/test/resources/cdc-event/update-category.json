@@ -205,19 +205,25 @@
     "version": 1
   },
   "payload": {
-    "before": null,
-    "after": {
+    "before": {
       "id": 1,
-      "name": "Juice",
+      "name": "Tea",
       "created_at": 1720757678000,
       "updated_at": 1720757678000,
       "old_name": null
+    },
+    "after": {
+      "id": 5,
+      "name": "Ice-Blended",
+      "created_at": 1720757679000,
+      "updated_at": 1720757679000,
+      "old_name": "Tea"
     },
     "source": {
       "version": "2.5.4.Final",
       "connector": "mysql",
       "name": "coffee_shop",
-      "ts_ms": 1720676610000,
+      "ts_ms": 1720689433000,
       "snapshot": "false",
       "db": "coffee_shop",
       "sequence": null,
@@ -225,13 +231,14 @@
       "server_id": 1,
       "gtid": null,
       "file": "binlog.00002",
-      "pos": 2530,
+      "pos": 1371,
       "row": 0,
       "thread": 1,
       "query": null
     },
-    "op": "c",
-    "ts_ms": 1720676610692,
+    "op": "u",
+    "ts_ms": 1720689433651,
     "transaction": null
   }
 }
+
