@@ -42,7 +42,7 @@ public class DataChangeListener {
         actionBuilder.put(DMLType.DELETE, new QueryBuilderDelete());
     }
 
-    @KafkaListener(topicPattern = "#{@topicPattern}", groupId = "coffee_shop")
+    @KafkaListener(topicPattern = "#{@topicPattern}", groupId = "data-replicate")
     @Transactional(noRollbackFor = Exception.class)
     public void listen(@Payload ConsumerRecord<String, String> event) {
         final CDCObject jsonNode;
@@ -56,37 +56,42 @@ public class DataChangeListener {
                 log.warn("Skip DLT topic in main listener: {}", event.topic());
                 return;
             }
+
             jsonNode = objectMapper.readValue(event.value(), CDCObject.class);
-            if (isSnapshot(jsonNode.getPayload().getSource().getSnapshot())) {
-                log.info("Received a tombstone event with key {}", event.key());
-                return;
-            }
 
             if (jsonNode.getPayload() == null || jsonNode.getPayload().getSource() == null) {
                 log.warn("Skip event because payload/source is missing, topic: {}", event.topic());
                 return;
             }
 
-            if (getActionType(jsonNode.getPayload()) == DMLType.READ) {
+            final String snapshotState = jsonNode.getPayload().getSource().getSnapshot();
+            if (isSnapshot(snapshotState)) {
+                if ("last".equals(snapshotState)) {
+                    log.debug("Snapshot finished, key {}", event.key());
+                } else {
+                    log.debug("Snapshot event ignored, key {}", event.key());
+                }
                 return;
             }
+
+            if (isDdlQuery(jsonNode)) {
+                final String ddlQuery = jsonNode.getPayload().getDdl();
+                final int result = entityManager.createNativeQuery(ddlQuery).executeUpdate();
+                log.info("DDL query: {}, affectedRows: {}", ddlQuery, result);
+                return;
+            }
+
+            final DMLType actionType = getActionType(jsonNode.getPayload());
 
             final String table = jsonNode.getPayload().getSource().getTable();
-            final String query = actionBuilder.get(getActionType(jsonNode.getPayload()))
-                    .build(table, mapPrivateKey.get(table), jsonNode);
-            if (isDdlQuery(jsonNode)) {
-                final int result = entityManager.createNativeQuery(query).executeUpdate();
-                log.info("DDL query: {}, affectedRows: {}", query, result);
-                return;
-            }
-
             final String database = jsonNode.getPayload().getSource().getDb();
 
 
             if (!mapPrivateKey.containsKey(table)) {
                 mapPrivateKey.put(table, tableMetaDataAccess.getPrimaryKeysFrom(database, table));
             }
-
+            final String query = actionBuilder.get(actionType)
+                    .build(table, mapPrivateKey.get(table), jsonNode);
 
             final int result = entityManager.createNativeQuery(query).executeUpdate();
             log.info("The captured query: {}, affectedRows: {}", query, result);
@@ -97,7 +102,11 @@ public class DataChangeListener {
     }
 
     private static DMLType getActionType(CDCObject.CDCPayload payload) {
-        return switch (payload.getOp()) {
+        final String operation = payload.getOp();
+        if (StringUtils.isBlank(operation)) {
+            return DMLType.READ;
+        }
+        return switch (operation) {
             case "c" -> DMLType.CREATE;
             case "d" -> DMLType.DELETE;
             case "u" -> DMLType.UPDATE;
@@ -106,13 +115,7 @@ public class DataChangeListener {
     }
 
     private static boolean isSnapshot(String snapshot) {
-        if (!"false".equals(snapshot)) {
-            if ("last".equals(snapshot)) {
-                log.info("Snapshot finished");
-            }
-            return true;
-        }
-        return false;
+        return !"false".equals(snapshot);
     }
 
     private boolean isDdlQuery(CDCObject jsonNode) {

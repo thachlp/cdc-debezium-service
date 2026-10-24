@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @EnableKafka
 public class KafkaConsumerConfiguration {
 
-    private static final String TOPIC_PATTERN_REGEX = "mysql\\..*";
+    private static final String TOPIC_PATTERN_REGEX = "cdc($|\\..*)";
     private static final String BOOTSTRAP_SERVERS = "0.0.0.0:9094";
 
     private static Map<String, Object> consumerProps() {
@@ -38,7 +38,7 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.METADATA_MAX_AGE_CONFIG, 10_000);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "coffee_shop");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "data-replicate");
         return props;
     }
 
