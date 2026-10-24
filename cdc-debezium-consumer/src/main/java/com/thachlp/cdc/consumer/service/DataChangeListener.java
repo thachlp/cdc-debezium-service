@@ -42,46 +42,19 @@ public class DataChangeListener {
         actionBuilder.put(DMLType.DELETE, new QueryBuilderDelete());
     }
 
-    @KafkaListener(topicPattern = "#{@topicPattern}", groupId = "data-replicate")
+    @KafkaListener(topics = "${app.kafka.cdc-topic:cdc.product}", groupId = "data-replicate")
     @Transactional(noRollbackFor = Exception.class)
     public void listen(@Payload ConsumerRecord<String, String> event) {
-        final CDCObject jsonNode;
         try {
-            if (event.value() == null) {
-                log.info("Received a tombstone event with key {}", event.key());
-                return;
-            }
-
-            if (isDltTopic(event.topic())) {
-                log.warn("Skip DLT topic in main listener: {}", event.topic());
-                return;
-            }
-
-            jsonNode = objectMapper.readValue(event.value(), CDCObject.class);
-
-            if (jsonNode.getPayload() == null || jsonNode.getPayload().getSource() == null) {
-                log.warn("Skip event because payload/source is missing, topic: {}", event.topic());
-                return;
-            }
-
-            final String snapshotState = jsonNode.getPayload().getSource().getSnapshot();
-            if (isSnapshot(snapshotState)) {
-                if ("last".equals(snapshotState)) {
-                    log.debug("Snapshot finished, key {}", event.key());
-                } else {
-                    log.debug("Snapshot event ignored, key {}", event.key());
-                }
-                return;
-            }
-
-            if (isDdlQuery(jsonNode)) {
-                final String ddlQuery = jsonNode.getPayload().getDdl();
-                final int result = entityManager.createNativeQuery(ddlQuery).executeUpdate();
-                log.info("DDL query: {}, affectedRows: {}", ddlQuery, result);
+            final CDCObject jsonNode = validateAndFilterEvent(event);
+            if (jsonNode == null) {
                 return;
             }
 
             final DMLType actionType = getActionType(jsonNode.getPayload());
+            if (actionType == DMLType.READ) {
+                return;
+            }
 
             final String table = jsonNode.getPayload().getSource().getTable();
             final String database = jsonNode.getPayload().getSource().getDb();
@@ -118,11 +91,40 @@ public class DataChangeListener {
         return !"false".equals(snapshot);
     }
 
-    private boolean isDdlQuery(CDCObject jsonNode) {
-        return jsonNode.getPayload() != null && StringUtils.isNotEmpty(jsonNode.getPayload().getDdl());
+    private CDCObject validateAndFilterEvent(ConsumerRecord<String, String> event) throws Exception {
+        if (event.value() == null) {
+            log.info("Received a tombstone event with key {}", event.key());
+            return null;
+        }
+
+        final CDCObject jsonNode = objectMapper.readValue(event.value(), CDCObject.class);
+
+        if (jsonNode.getPayload() == null || jsonNode.getPayload().getSource() == null) {
+            log.warn("Skip event because payload/source is missing, topic: {}", event.topic());
+            return null;
+        }
+
+        final String snapshotState = jsonNode.getPayload().getSource().getSnapshot();
+        if (isSnapshot(snapshotState)) {
+            if ("last".equals(snapshotState)) {
+                log.info("Snapshot finished, key {}", event.key());
+            } else {
+                log.info("Snapshot event ignored, key {}", event.key());
+            }
+            return null;
+        }
+
+        if (isDdlQuery(jsonNode)) {
+            final String ddlQuery = jsonNode.getPayload().getDdl();
+            final int result = entityManager.createNativeQuery(ddlQuery).executeUpdate();
+            log.info("DDL query: {}, affectedRows: {}", ddlQuery, result);
+            return null;
+        }
+
+        return jsonNode;
     }
 
-    private boolean isDltTopic(String topic) {
-        return StringUtils.endsWith(topic, ".DLT") || StringUtils.contains(topic, ".DLT.");
+    private boolean isDdlQuery(CDCObject jsonNode) {
+        return jsonNode.getPayload() != null && StringUtils.isNotEmpty(jsonNode.getPayload().getDdl());
     }
 }

@@ -21,13 +21,11 @@ import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfiguration {
 
-    private static final String TOPIC_PATTERN_REGEX = "cdc($|\\..*)";
     private static final String BOOTSTRAP_SERVERS = "0.0.0.0:9094";
 
     private static Map<String, Object> consumerProps() {
@@ -84,10 +82,5 @@ public class KafkaConsumerConfiguration {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         factory.setCommonErrorHandler(kafkaErrorHandler);
         return factory;
-    }
-
-    @Bean
-    public Pattern topicPattern() {
-        return Pattern.compile(TOPIC_PATTERN_REGEX);
     }
 }

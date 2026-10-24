@@ -25,7 +25,3 @@ public final class CdcEventTestFiles {
         return objectMapper;
     }
 }
-
-
-
-

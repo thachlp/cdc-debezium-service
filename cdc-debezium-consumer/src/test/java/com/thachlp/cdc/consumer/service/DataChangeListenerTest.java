@@ -73,7 +73,3 @@ class DataChangeListenerTest {
         verifyNoInteractions(tableMetaDataAccess);
     }
 }
-
-
-
-
