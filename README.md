@@ -43,15 +43,21 @@ curl -i -X POST \
     "name": "source-connector",
     "config": {
       "connector.class": "io.debezium.connector.mysql.MySqlConnector",
-      "database.hostname": "mysql",
+      "database.hostname": "host.docker.internal",
       "database.port": "3306",
       "database.user": "root",
       "database.password": "123456",
       "database.server.id": "184054",
-      "topic.prefix": "mysql",
+      "topic.prefix": "coffee_shop",
       "database.include.list": "coffee_shop",
       "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
-      "schema.history.internal.kafka.topic": "schemahistory.coffee_shop"
+      "schema.history.internal.kafka.topic": "schemahistory.coffee_shop",
+      "snapshot.mode": "no_data",
+      "transforms": "route",
+      "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+      "transforms.route.regex": ".*",
+      "transforms.route.replacement": "cdc.product"
+    
     }
   }'
 ```
