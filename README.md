@@ -57,7 +57,6 @@ curl -i -X POST \
       "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
       "transforms.route.regex": ".*",
       "transforms.route.replacement": "cdc.product"
-    
     }
   }'
 ```
